@@ -35,9 +35,8 @@ pipeline{
         } 
         stage('port expose'){
             steps{
-                sh 'docker run -dt -p 8085:80 --name bank01 myimg /bin/bash'
+                sh 'docker run -dt -p 8085:80 --name bank01 myimg'
             }
         }
-    
     }
 }
