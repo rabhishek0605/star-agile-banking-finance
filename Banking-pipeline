@@ -3,7 +3,7 @@ pipeline{
     stages{
         stage('checkout'){
             steps {
-            git url: 'https://github.com/rabhishek0605/star-agile-banking-finance'
+            git url: 'https://github.com/rabhishek0605/star-agile-banking-finance/blob/master/Banking-pipeline'
             echo 'github url checkout'
             }
         }    
@@ -35,7 +35,7 @@ pipeline{
         } 
         stage('port expose'){
             steps{
-                sh 'docker run -dt -p 8085:80 --name bank01 myimg'
+                sh 'docker run -dt -p 8081:80 --name bank01 myimg'
             }
         }
     }
