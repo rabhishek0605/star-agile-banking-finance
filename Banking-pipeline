@@ -1,0 +1,43 @@
+pipeline{
+    agent any
+    stages{
+        stage('checkout'){
+            steps {
+            git url: 'https://github.com/rabhishek0605/star-agile-banking-finance'
+            echo 'github url checkout'
+            }
+        }    
+        stage('compile the project code'){
+            steps{
+                echo 'it started to compile'
+                sh 'mvn compile'
+            }
+        }
+        stage('test the project code'){
+            steps{
+                sh 'mvn test'
+            }
+        }
+        stage('QA the project code'){
+            steps{
+                sh 'mvn checkstyle:checkstyle'
+            }
+        }    
+        stage('package the code'){
+            steps{
+                sh 'mvn package'
+            }
+        }
+        stage('run the dockerfile'){
+            steps{
+                sh 'docker build -t myimg .'
+            }
+        } 
+        stage('port expose'){
+            steps{
+                sh 'docker run -dt -p 8085:80 --name bank01 myimg /bin/bash'
+            }
+        }
+    
+    }
+}
