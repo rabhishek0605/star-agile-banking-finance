@@ -1,0 +1,46 @@
+pipeline{
+    agent any
+    stages{
+        stage('checkout'){
+            steps{
+                git url: 'https://github.com/rabhishek0605/star-agile-health-care'
+                echo 'guthub url checkout'
+            }
+        }
+        stage('compile the healthcare code'){
+            steps{
+                sh 'mvn compile'
+                echo 'code compiled'
+            }
+        }
+        stage('test the healthcare code'){
+            steps{
+                sh 'mvn test'
+                echo 'code tested'
+            }
+        }
+        stage('QA the healthcare code'){
+            steps{
+                sh ' mvn checkstyle:checkstyle'
+                echo 'code has done QA'
+            }
+        }
+        stage('package the code'){
+            steps{
+                sh 'mvn clean package'
+                echo 'code has packaged'
+            }
+        }
+        stage('build the dockerfile'){
+            steps{
+                sh 'docker build -t abhiimg .'
+            }
+        }
+        stage('expose the port'){
+            steps{
+                sh 'docker run -dt -p 8082:8082 --name abhi01 abhiimg'
+                echo 'port exposed to 8082'
+            }
+        }
+    }
+}
