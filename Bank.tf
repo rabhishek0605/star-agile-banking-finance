@@ -63,10 +63,10 @@ resource "aws_network_interface" "example" {
   }
 }
 
-resource "aws_eip" "example" {
-  vpc      = true
-  instance = test-server
-  depends_on = [aws_internet_gateway.example]
+resource "aws_eip" "proj-eip" {
+  vpc                  = true
+  network_interface    = aws_network_interface.proj-ni.id
+  associate_with_private_ip = "10.0.1.10"
 }
 
 resource "aws_instance" "test-Server" {
