@@ -1,81 +1,45 @@
-# Initialize Terraform
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.0"
-    }
-  }
-}
-
-# Configure the AWS provider
 provider "aws" {
-  region = "ap-south-1"
+  region = "us-east-1"
 }
-
-# Creating a VPC
-resource "aws_vpc" "proj-vpc" {
+resource "aws_vpc" "example" {
   cidr_block = "10.0.0.0/16"
 }
 
-# Create an Internet Gateway
-resource "aws_internet_gateway" "proj-ig" {
-  vpc_id = aws_vpc.proj-vpc.id
-
-  tags = {
-    Name = "gateway1"
-  }
+resource "aws_internet_gateway" "example" {
+  vpc_id = aws_vpc.example.id
 }
 
-# Setting up the route table
-resource "aws_route_table" "proj-rt" {
-  vpc_id = aws_vpc.proj-vpc.id
+resource "aws_route_table" "example" {
+  vpc_id = aws_vpc.example.id
 
   route {
-    # pointing to the internet
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.proj-ig.id
-  }
-
-  route {
-    ipv6_cidr_block = "::/0"
-    gateway_id      = aws_internet_gateway.proj-ig.id
-  }
-
-  tags = {
-    Name = "rtl"
+    gateway_id = aws_internet_gateway.example.id
   }
 }
 
-# Creating a subnet
-resource "aws_subnet" "proj-subnet" {
-  vpc_id            = aws_vpc.proj-vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "ap-south-1b"
+resource "aws_subnet" "example" {
+  vpc_id     = aws_vpc.example.id
+  cidr_block = "10.0.1.0/24"
 }
 
-# Associating the subnet with the route table
-resource "aws_route_table_association" "proj-rt-sub-assoc" {
-  subnet_id      = aws_subnet.proj-subnet.id
-  route_table_id = aws_route_table.proj-rt.id
+resource "aws_route_table_association" "example" {
+  subnet_id      = aws_subnet.example.id
+  route_table_id = aws_route_table.example.id
 }
 
-# Creating a Security Group
-resource "aws_security_group" "proj-sg" {
-  name        = "proj-sg"
-  description = "Enable web traffic for the project"
-  vpc_id      = aws_vpc.proj-vpc.id
+# Security Group Setup
+resource "aws_security_group" "example" {
+  vpc_id = aws_vpc.example.id
 
   ingress {
-    description = "HTTP traffic"
-    from_port   = 0
-    to_port     = 65000
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description = "Allow port 80 inbound"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -83,74 +47,48 @@ resource "aws_security_group" "proj-sg" {
   }
 
   ingress {
-    description = "HTTPS traffic"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
 
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_network_interface" "example" {
+  subnet_id   = aws_subnet.example.id
+  private_ips = ["10.0.1.10"]  # Update with desired IP address
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+  tags = {
+    Name = "Example Network Interface"
   }
 }
 
-# Creating a new network interface
-resource "aws_network_interface" "proj-ni" {
-  subnet_id        = aws_subnet.proj-subnet.id
-  private_ips      = ["10.0.1.10"]
-  security_groups = [aws_security_group.proj-sg.id]
+resource "aws_eip" "example" {
+  vpc      = true
+  instance = test-server
+  depends_on = [aws_internet_gateway.example]
 }
 
-# Attaching an elastic IP to the network interface
-resource "aws_eip" "proj-eip" {
-  vpc                  = true
-  network_interface    = aws_network_interface.proj-ni.id
-  associate_with_private_ip = "10.0.1.10"
-}
-
-# Creating an Ubuntu EC2 instance
-resource "aws_instance" "Prod-Server" {
-  ami              = "ami-0ef82eeba2c7a0eeb"
+resource "aws_instance" "test-Server" {
+  ami              = "ami-07d9b9ddc6cd8dd30"
   instance_type    = "t2.micro"
-  availability_zone = "ap-south-1b"
-  resource "aws_key_pair" "tf_kp" {
-  key_name   = "tf_kp"
-  public_key = tls_private_key.rsa.public_key_openssh
-}
- remove "tls_private_key" "rsa" {
-  algorithm = "RSA"
-  rsa_bits = 4096
-}
-resource "local_file" "tf-kp" {
-  content  = tls_private_key.rsa.private_key_pem
-  filename = "tfkey"
-}
+  availability_zone = "us-east-1a"
+  key_name         = "New-KP"
+  
+  tags = {
+    Name = "test-Server"
+  }
+
   network_interface {
     device_index         = 0
-    network_interface_id = aws_network_interface.proj-ni.id
+    network_interface_id = aws_network_interface.example.id
   }
 
   user_data = <<-EOF
     #!/bin/bash
     sudo apt-get update -y
-    sudo apt install docker.io -y
-    sudo systemctl enable docker
-    sudo docker run -itd -p 8083:8081 rabhishek0605/banking-project
-    sudo docker start $(docker ps -aq)
+    sudo apt-get install -y apache2
+    sudo systemctl start apache2
+    sudo systemctl enable apache2
   EOF
-
-  tags = {
-    Name = "Prod-Server"
-  }
 }
