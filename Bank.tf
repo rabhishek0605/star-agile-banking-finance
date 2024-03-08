@@ -49,13 +49,9 @@ resource "aws_route_table" "proj-rt" {
 
 # Creating a subnet
 resource "aws_subnet" "proj-subnet" {
-  availability_zone = "ap-south-1a"  # Choose the appropriate availability zone here
-  cidr_block        = "10.0.1.0/24"
   vpc_id            = aws_vpc.proj-vpc.id
-
-  tags = {
-    Name = "proj-subnet"
-  }
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "ap-south-1"
 }
 
 # Associating the subnet with the route table
