@@ -1,6 +1,7 @@
 provider "aws" {
   region = "us-east-1"
 }
+
 resource "aws_vpc" "example" {
   cidr_block = "10.0.0.0/16"
 }
@@ -65,7 +66,7 @@ resource "aws_network_interface" "example" {
 
 resource "aws_eip" "proj-eip" {
   vpc                  = true
-  network_interface    = aws_network_interface.proj-ni.id
+  network_interface    = aws_network_interface.example.id
   associate_with_private_ip = "10.0.1.10"
 }
 
