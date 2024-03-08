@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1a"
+  region = "us-east-1"
 }
 
 resource "aws_vpc" "example" {
@@ -67,13 +67,13 @@ resource "aws_network_interface" "example" {
 resource "aws_eip" "proj-eip" {
   vpc                  = true
   network_interface    = aws_network_interface.example.id
-  associate_with_private_ip = "10.0.1.10"
+  associate_with_private_ip = "10.0.2.10"
 }
 
 resource "aws_instance" "test-Server" {
   ami              = "ami-07d9b9ddc6cd8dd30"
   instance_type    = "t2.micro"
-  availability_zone = "us-east-1a"
+  availability_zone = "us-east-1"
   key_name         = "New-KP"
   
   tags = {
