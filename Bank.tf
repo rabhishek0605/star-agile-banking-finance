@@ -129,7 +129,7 @@ resource "aws_instance" "Test-Server" {
  ami = "ami-0c7217cdde317cfec"
  instance_type = "t2.micro"
  availability_zone = "us-east-1b"
- key_name = "test-key"
+ key_name = "New-KP"
  network_interface {
  device_index = 0
  network_interface_id = aws_network_interface.proj-ni.id
