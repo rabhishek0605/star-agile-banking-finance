@@ -67,7 +67,7 @@ resource "aws_network_interface" "example" {
 resource "aws_eip" "proj-eip" {
   vpc                  = true
   network_interface    = aws_network_interface.example.id
-  associate_with_private_ip = "10.0.2.10"
+  associate_with_private_ip = "10.0.1.10"
 }
 
 resource "aws_instance" "test-Server" {
