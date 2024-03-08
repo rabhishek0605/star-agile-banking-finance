@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"
+  region = "us-east-1f"
 }
 
 resource "aws_vpc" "example" {
@@ -71,9 +71,9 @@ resource "aws_eip" "proj-eip" {
 }
 
 resource "aws_instance" "test-Server" {
-  ami              = "ami-07d9b9ddc6cd8dd30"
+  ami              = "ami-08ad83fdab5ba8166"
   instance_type    = "t2.micro"
-  availability_zone = "us-east-1"
+  availability_zone = "us-east-1f"
   key_name         = "New-KP"
   
   tags = {
