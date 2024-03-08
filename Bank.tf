@@ -10,7 +10,7 @@ terraform {
 
 # Configure the AWS provider
 provider "aws" {
-  region = "ap-south-1a"
+  region = "ap-south-1"
 }
 
 # Creating a VPC
@@ -127,7 +127,7 @@ resource "aws_eip" "proj-eip" {
 resource "aws_instance" "Prod-Server" {
   ami              = "ami-03bb6d83c60fc5f7c"
   instance_type    = "t2.micro"
-  availability_zone = "ap-south-1a"
+  availability_zone = "ap-south-1"
   key_name         = "New-KP"
 
   network_interface {
