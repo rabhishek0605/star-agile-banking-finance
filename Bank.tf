@@ -10,7 +10,7 @@ terraform {
 
 # Configure the AWS provider
 provider "aws" {
-  region = "ap-south-1"
+  region = "ap-south-1a"
 }
 
 # Creating a VPC
@@ -49,9 +49,13 @@ resource "aws_route_table" "proj-rt" {
 
 # Creating a subnet
 resource "aws_subnet" "proj-subnet" {
-  vpc_id            = aws_vpc.proj-vpc.id
+  availability_zone = "ap-south-1a"  # Choose the appropriate availability zone here
   cidr_block        = "10.0.1.0/24"
-  availability_zone = "ap-south-1"
+  vpc_id            = aws_vpc.proj-vpc.id
+
+  tags = {
+    Name = "proj-subnet"
+  }
 }
 
 # Associating the subnet with the route table
@@ -123,7 +127,7 @@ resource "aws_eip" "proj-eip" {
 resource "aws_instance" "Prod-Server" {
   ami              = "ami-03bb6d83c60fc5f7c"
   instance_type    = "t2.micro"
-  availability_zone = "ap-south-1"
+  availability_zone = "ap-south-1a"
   key_name         = "New-KP"
 
   network_interface {
