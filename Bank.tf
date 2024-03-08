@@ -124,34 +124,18 @@ resource "aws_instance" "Prod-Server" {
   ami              = "ami-0ef82eeba2c7a0eeb"
   instance_type    = "t2.micro"
   availability_zone = "ap-south-1b"
-  key_name         = "demo"
-  public_key       = "PuTTY-User-Key-File-2: ssh-rsa
-Encryption: none
-Comment: New-KP
-Public-Lines: 6
-AAAAB3NzaC1yc2EAAAADAQABAAABAQCMKYyFIRrsgysU4nIwLOdCrnGMFBf+eVvO
-LWeNHqsGIasFfeEmBX6DBxYIfrTGZfhExiN3Ih0bIGeiRONVgumjylztuwbWqFQq
-ZkUW0FkQxXXbJu7LUMo3yrap6V04ISRRBjmAwSy16R54ssvXV6Eoa+gYk01FkrSR
-alsC+72OgGcWMerOpxaTcs6umF9vqK/LbEYjkYw6RbMsf+CvAOp73IWckFU3EPS2
-4yaDhrZp2Ezl4OiDxL6cZwHIJzGD77Q9ASxQ7Vav13ehPTTP9dQYyBVAjUrS9MR3
-cQpbofhl2yiVKy7vY7iIO/0Zy17Tl+uMILsIotMlFPLhRTy2MAw3
-Private-Lines: 14
-AAABAF0MHCgpEQmgDlKf/bQzqxbeXazjjgY2pJacF9lcWacJZNKRfY1TKmhrpNng
-27u15/ooG1U0RWRDv+i+mLik3twINGbxuRl5x94Z5JW/nNEAdTwWfYJl0Mj2/wqP
-TH49qjFL05LBKyBccQkpkR8VInyGHh9qcmrUeKDsnRy+6FkXslBi834pJMDOWvUa
-Qn+wie1T2U5Qxc45f07cT5zhXALdMLdi8tkRHP0e24X3OoKOaELoRP3n5JSquT/8
-refxlHd7FF0QsyyCy44hbFgpFRuOWslGubpbyPmghD/cHH0AVxQnIiMItSi0HEg6
-fE14Oamss7cHoRIVEvmi1aY1wyEAAACBAM9Q2nR4ZQzz9m/g8es3rJNnBGcGgjw9
-z7LG1ezCRCcBltjvPOUIU6b/olXJ7/a0YOn2hvwc8cmJnKNAn9pA3kCxfGAhaN87
-awj1cvYUlCxZW62V/T19Ec9CCaSX1ldxAfsJ0SxeeeYE4cPAEuKvDbBHkMMyUHsx
-iMHk3qPAiWnHAAAAgQCtE6VVUg8QZVmkyUbsAfluFQTGBE4N00O2epQIH7AjDUqX
-GLyIbk/Gwyterh9H7WIv5PNvQeJgb/428t32JB1pTOcXs5F7GggztPIhcXx9ub4Z
-EYgYxJBLv+s50fBO6GGEplo/46gZ/yoQCsHa7h1eagk/xaNfgJtHIqwRy5/KEQAA
-AIBPJhA5nESMOlVE4tH5H6cd1spDMPQbpsHmR1mrLKVgFGDBrnTP9ka/PPPECE9O
-kuM9jqVElAAb9ygmytqfN4oKRx6LToVEYNOn2uEPKJYaqZ2LZOTDtIKnR2trwI/h
-bMGO4nzOMrhULP/aQD4r7Jp5dnUhMKMHvSyumj2MAR0JXQ==
-Private-MAC: 2c6b08dc809898494339947c77adf27b84c23b69"
-
+  resource "aws_key_pair" "tf_kp" {
+  key_name   = "tf_kp"
+  public_key = tls_private_key.rsa.public_key_openssh
+}
+ remove "tls_private_key" "rsa" {
+  algorithm = "RSA"
+  rsa_bits = 4096
+}
+resource "local_file" "tf-kp" {
+  content  = tls_private_key.rsa.private_key_pem
+  filename = "tfkey"
+}
   network_interface {
     device_index         = 0
     network_interface_id = aws_network_interface.proj-ni.id
